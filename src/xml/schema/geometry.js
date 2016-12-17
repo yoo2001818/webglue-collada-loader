@@ -1,5 +1,5 @@
 import { attributes, hierarchy, hoist, rename, registerId, registerIdSilent,
-  registerSidOptional, multipleMap } from '../type';
+  handleInstance, multipleMap } from '../type';
 
 export default {
   geometry: hoist({
@@ -28,11 +28,5 @@ export default {
 
   instanceGeometry: hoist({
     bind_material: 'bindMaterial'
-  }, {
-    push(node, frame) {
-      registerSidOptional.push.call(this, node, frame);
-      frame.data.geometry = node.attributes.url;
-    },
-    pop: registerSidOptional.pop
-  }, {})
+  }, handleInstance, {})
 };

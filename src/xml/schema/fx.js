@@ -1,5 +1,5 @@
 import { NOOP, attributes, hierarchy, hoist, rename, registerSid, registerId,
-  registerSidOptional, multiple, multipleMap } from '../type';
+  registerSidOptional, handleInstance, multiple, multipleMap } from '../type';
 
 const MATERIAL_STRUCTURE = {
   emission: 'colorOrTexture',
@@ -115,11 +115,7 @@ export default {
       }),
       (data, frame) => frame.ref
     ))
-  }, {
-    push(node, frame) {
-      frame.data.effect = node.attributes.url;
-    }
-  }),
+  }, handleInstance),
 
   bindMaterial: hierarchy({
     param: rename('params', multiple(attributes())),

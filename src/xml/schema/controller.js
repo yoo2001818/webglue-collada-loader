@@ -1,5 +1,5 @@
 import { attributes, hierarchy, hoist, rename, registerId, unwrap,
-  multipleMap } from '../type';
+  multipleMap, handleInstance } from '../type';
 
 export default {
   controller: hoist({
@@ -26,5 +26,5 @@ export default {
   instanceController: hierarchy({
     skeleton: 'string',
     bind_material: unwrap('bindMaterial')
-  })
+  }, handleInstance)
 };

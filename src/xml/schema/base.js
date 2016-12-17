@@ -1,5 +1,6 @@
 import { NOOP, attributes, textValue, hierarchy, library, rename,
-  multiple, addTrigger, hoist, registerIdSilent, registerId } from '../type';
+  multiple, addTrigger, hoist, registerIdSilent, registerId,
+  registerSidOptional } from '../type';
 
 export default {
   noop: NOOP,
@@ -14,6 +15,9 @@ export default {
   floatArray: textValue(v => new Float32Array(v.split(/\s+/).map(parseFloat))),
   int: textValue(v => parseFloat(v)),
   intArray: textValue(v => new Int32Array(v.split(/\s+/).map(parseFloat))),
+
+  floatSid: addTrigger('float', registerSidOptional),
+  floatArraySid: addTrigger('floatArray', registerSidOptional),
 
   COLLADA: hierarchy({
     asset: 'asset',
@@ -31,7 +35,11 @@ export default {
     // COLLADA FX
     library_images: rename('images', library('image', 'image')),
     library_effects: rename('effects', library('effect', 'effect')),
-    library_materials: rename('materials', library('material', 'material'))
+    library_materials: rename('materials', library('material', 'material')),
+    scene: hierarchy({
+      instance_visual_scene: rename('visualScene',
+        attributes(v => v.attributes.url))
+    })
   }, ({ attributes }) => {
     // Check version
     if (attributes.version.slice(0, 3) !== '1.4') {
@@ -74,32 +82,5 @@ export default {
     technique_common: rename('options', hoist({
       accessor: attributes()
     }))
-  }, {
-    push: registerId.push,
-    pop(data, frame) {
-      // TODO This should be outside XML parser (Should do post processing)
-      if (data.options != null) {
-        data.axis = parseInt(data.options.stride) || 1;
-        if (data.source != null) {
-          data.data = this.resolveURI(data.source, frame);
-        }
-        let offset = parseInt(data.options.offset);
-        if (!isNaN(offset)) {
-          // TODO We shouldn't care about data structure size...
-          data.offset = offset * 4;
-        }
-        let count = parseInt(data.options.count);
-        if (!isNaN(count)) {
-          data.count = count;
-          // Slice the array
-          if (Array.isArray(data.data)) {
-            data.data = data.data.slice(0, count * data.axis);
-          } else {
-            data.data = data.data.subarray(0, count * data.axis);
-          }
-        }
-      }
-      return registerId.pop.call(this, data, frame);
-    }
-  })
+  }, registerId)
 };

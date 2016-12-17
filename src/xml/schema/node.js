@@ -41,7 +41,10 @@ export default {
       return mat4.fromTranslation(tmpMat4, input);
     }),
     instance_geometry: rename('geometries', multiple('instanceGeometry')),
-    instance_controller: rename('controllers', multiple('instanceController'))
+    instance_controller: rename('controllers', multiple('instanceController')),
+    instance_camera: rename('cameras', multiple('instanceCamera')),
+    instance_light: rename('lights', multiple('instanceLight')),
+    instance_node: rename('nodes', multiple('instanceNode'))
   }, {
     push(node, frame) {
       registerId.push.call(this, node, frame);
