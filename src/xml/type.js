@@ -153,6 +153,7 @@ export function hoist(children, triggers, initialValue = undefined) {
     },
     popChild(data, frame, childFrame) {
       let result = data;
+      if (result == null) return;
       if (frame.targetSchema && frame.targetSchema.merge != null) {
         result = frame.targetSchema.merge(frame.data, result, childFrame);
       }
@@ -161,7 +162,7 @@ export function hoist(children, triggers, initialValue = undefined) {
   };
 }
 
-export function hierarchy(children, triggers) {
+export function hierarchy(children, triggers, initialValue) {
   let onPush, onPop;
   if (typeof triggers === 'function') onPush = triggers;
   else if (triggers != null) {
@@ -171,7 +172,7 @@ export function hierarchy(children, triggers) {
   return {
     push(node, frame) {
       // TODO attributes
-      frame.data = {};
+      frame.data = Object.assign({}, initialValue);
       if (onPush != null) onPush.call(this, node, frame);
     },
     opentag(node, frame) {
@@ -191,7 +192,6 @@ export function hierarchy(children, triggers) {
       this.pop();
     },
     pop(data, frame) {
-      console.log(frame.data);
       if (onPop != null) return onPop.call(this, frame.data, frame);
       return frame.data;
     },

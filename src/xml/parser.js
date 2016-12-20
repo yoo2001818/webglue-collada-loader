@@ -35,8 +35,12 @@ export default class Parser {
     };
   }
   resolveSchema(schema) {
-    if (typeof schema === 'string') return this.schema[schema];
-    if (typeof schema === 'function') return schema.call(this);
+    if (typeof schema === 'string') {
+      return this.resolveSchema(this.schema[schema]);
+    }
+    if (typeof schema === 'function') {
+      return this.resolveSchema(schema.call(this));
+    }
     return schema;
   }
   parse(data) {

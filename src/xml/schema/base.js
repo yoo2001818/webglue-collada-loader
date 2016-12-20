@@ -70,6 +70,9 @@ export default {
         throw new Error('Provided file is not COLLADA format');
       }
       this.push('COLLADA', node);
+    },
+    popChild(data) {
+      this.result = data;
     }
   },
 
