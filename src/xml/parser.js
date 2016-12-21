@@ -52,7 +52,7 @@ export default class Parser {
     parser.onattribute = this.getDelegator(v => v.attribute);
     parser.onend = this.getDelegator(v => v.end);
     parser.write(data).close();
-    // TODO Return root context
+    return this.result;
   }
   resolveURI(name) {
     if (name.charAt(0) === '#') {

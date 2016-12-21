@@ -1,6 +1,6 @@
-import loadCollada from 'webglue/loader/collada';
+import loadCollada from '../../src';
 
 export default function collada() {
-  let data = loadCollada(require('../geom/cat.dae'));
+  let data = loadCollada(require('../geom/multiMaterial.dae'));
   return () => {};
 }

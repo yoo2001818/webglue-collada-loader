@@ -14,10 +14,7 @@ module.exports = {
   resolve: {
     root: path.join(__dirname, 'client-test'),
     extensions: ['', '.js'],
-    modulesDirectories: ['node_modules'],
-    alias: {
-      webglue: path.join(__dirname, 'src')
-    }
+    modulesDirectories: ['node_modules']
   },
   // devtool: 'source-map',
   plugins: [

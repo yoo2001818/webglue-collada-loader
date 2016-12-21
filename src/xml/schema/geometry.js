@@ -1,5 +1,5 @@
 import { attributes, hierarchy, hoist, rename, registerId, registerIdSilent,
-  handleInstance, multipleMap } from '../type';
+  handleInstance, multipleMap, multiple } from '../type';
 
 export default {
   geometry: hoist({
@@ -9,10 +9,10 @@ export default {
       vertices: hoist({
         input: multipleMap(attributes(), (data, frame) => frame.data.semantic)
       }, registerIdSilent),
-      lines: 'polylist',
-      linestrips: 'polylist',
-      triangles: 'polylist',
-      polylist: 'polylist'
+      lines: rename('polylists', multiple('polylist')),
+      linestrips: rename('polylists', multiple('polylist')),
+      triangles: rename('polylists', multiple('polylist')),
+      polylist: rename('polylists', multiple('polylist'))
     })
   }, registerId),
   polylist: hierarchy({
@@ -22,7 +22,7 @@ export default {
   }, {
     push: (node, frame) => {
       frame.data.material = node.attributes.material;
-      frame.parent.data.type = node.name;
+      frame.data.type = node.name;
     }
   }),
 

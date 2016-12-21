@@ -1,6 +1,6 @@
-import Renderer from 'webglue/renderer';
-import Camera from 'webglue/camera';
-import CameraController from 'webglue/contrib/blenderController';
+import Renderer from 'webglue/lib/renderer';
+import Camera from 'webglue/lib/camera';
+import CameraController from 'webglue/lib/contrib/blenderController';
 import './style/index.css';
 
 function requireAll(context) {
@@ -86,7 +86,6 @@ loadSceneList();
 loadScene(window.localStorage.index || 0);
 
 let prevTime = -1;
-let timer = 0;
 
 // Create controller
 let camera = new Camera();
@@ -96,7 +95,6 @@ function animate(time) {
   if (prevTime === -1) prevTime = time;
   let delta = (time - prevTime) / 1000;
   prevTime = time;
-  timer += delta;
 
   controller.update(delta);
 
