@@ -5,7 +5,7 @@ import { mat3, mat4 } from 'gl-matrix';
 export default function collada(renderer) {
   const gl = renderer.gl;
   let data = loadCollada(require('../geom/cat.dae'));
-  let geom = renderer.geometries.create(channelGeom(data.geometries[0][0]));
+  let geom = renderer.geometries.create(channelGeom(data.geometries[1][0]));
   let shader = renderer.shaders.create(
     require('../shader/normal.vert'),
     require('../shader/normal.frag')

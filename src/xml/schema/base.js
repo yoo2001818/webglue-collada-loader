@@ -83,11 +83,20 @@ export default {
     int_array: rename('data', addTrigger('intArray', registerIdSilent)),
     // TODO Read param names
     technique_common: rename('options', hoist({
-      accessor: attributes(({attributes}) => Object.assign(attributes, {
-        count: parseInt(attributes.count),
-        offset: parseInt(attributes.offset) || 0,
-        stride: parseInt(attributes.stride)
-      }))
+      accessor: hierarchy(
+        {
+          param: rename('params', multiple(attributes(
+            ({ attributes }) => attributes.name
+          )))
+        },
+        ({ attributes }, frame) => {
+          frame.data = Object.assign(attributes, {
+            count: parseInt(attributes.count),
+            offset: parseInt(attributes.offset) || 0,
+            stride: parseInt(attributes.stride)
+          });
+        }
+      )
     }))
   }, registerId)
 };

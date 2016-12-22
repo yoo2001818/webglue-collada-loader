@@ -6,12 +6,6 @@ const SEMANTIC_ATTRIBUTE_TABLE = {
   COLOR: 'aColor'
 };
 
-const SEMANTIC_FLIP_AXIS = {
-  POSITION: true,
-  NORMAL: true,
-  TANGENT: true
-};
-
 export default {
   document(data) {
     let result = {};
@@ -99,7 +93,16 @@ export default {
     } else {
       source = source.slice(offset, offset + count * stride);
     }
-    console.log(options);
+    // If X / Y / Z is provided, we need to flip the axis
+    if (this.flipAxis && options.params.indexOf('X') !== -1) {
+      if (source.subarray != null) source = source.slice();
+      for (let i = 0; i < source.length; i += 3) {
+        // Flip Y, Z, while inverting Y value
+        let tmp = -source[i + 1];
+        source[i + 1] = source[i + 2];
+        source[i + 2] = tmp;
+      }
+    }
     return { source, axis: stride };
   },
   raw(data) {
