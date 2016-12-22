@@ -9,5 +9,5 @@ export default function loadCollada(data) {
   let result = parser.parse(data);
   // Process the data.
   let processor = new Processor(processorSchema, parser.namespace);
-  processor.process('document', result);
+  return processor.process('document', result);
 }

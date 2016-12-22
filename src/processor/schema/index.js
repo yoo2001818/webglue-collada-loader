@@ -6,9 +6,16 @@ const SEMANTIC_ATTRIBUTE_TABLE = {
   COLOR: 'aColor'
 };
 
+const SEMANTIC_FLIP_AXIS = {
+  POSITION: true,
+  NORMAL: true,
+  TANGENT: true
+};
+
 export default {
   document(data) {
     let result = {};
+    this.flipAxis = data.asset.upAxis !== 'Y_UP';
     result.geometries = (data.geometries || []).map(this.process.bind(this,
       'geometry'));
     console.log(result);
@@ -73,7 +80,7 @@ export default {
           offset += vcount[i] * stride;
         }
       }
-      return { attributes, indices };
+      return { attributes, indices, material: polylist.material };
     });
     console.log(result);
     return result;
@@ -92,6 +99,7 @@ export default {
     } else {
       source = source.slice(offset, offset + count * stride);
     }
+    console.log(options);
     return { source, axis: stride };
   },
   raw(data) {
