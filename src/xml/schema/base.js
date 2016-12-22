@@ -83,7 +83,11 @@ export default {
     int_array: rename('data', addTrigger('intArray', registerIdSilent)),
     // TODO Read param names
     technique_common: rename('options', hoist({
-      accessor: attributes()
+      accessor: attributes(({attributes}) => Object.assign(attributes, {
+        count: parseInt(attributes.count),
+        offset: parseInt(attributes.offset) || 0,
+        stride: parseInt(attributes.stride)
+      }))
     }))
   }, registerId)
 };

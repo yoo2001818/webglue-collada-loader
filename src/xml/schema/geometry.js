@@ -7,7 +7,7 @@ export default {
       source: rename('sources', multipleMap('source',
         (data, frame) => frame.id)),
       vertices: hoist({
-        input: multipleMap(attributes(), (data, frame) => frame.data.semantic)
+        input: multiple('inputUnshared')
       }, registerIdSilent),
       lines: rename('polylists', multiple('polylist')),
       linestrips: rename('polylists', multiple('polylist')),
@@ -16,7 +16,7 @@ export default {
     })
   }, registerId),
   polylist: hierarchy({
-    input: multipleMap(attributes(), (data, frame) => frame.data.semantic),
+    input: multiple('inputShared'),
     p: 'intArray',
     vcount: 'intArray'
   }, {
@@ -25,6 +25,10 @@ export default {
       frame.data.type = node.name;
     }
   }),
+  inputUnshared: attributes(),
+  inputShared: attributes(({attributes}) => Object.assign(attributes, {
+    offset: parseInt(attributes.offset)
+  })),
 
   instanceGeometry: hoist({
     bind_material: 'bindMaterial'
