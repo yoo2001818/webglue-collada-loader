@@ -40,6 +40,17 @@ for (let i = 1; i <= 4; ++i) {
 
 
 export default {
+  image: hierarchy({
+    // TODO Change data to binary format
+    data: 'string',
+    init_from: rename('url', 'string')
+  }, {
+    push(data, frame) {
+      registerId.push(data, frame);
+      Object.assign(frame.data, data.attributes);
+    },
+    pop: registerId.pop
+  }),
   effect: hierarchy({
     asset: 'asset',
     image: rename('images', multiple('image')),

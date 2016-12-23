@@ -5,15 +5,29 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.78.0 commit date:2016-10-24, commit time:12:20, hash:e8299c8</authoring_tool>
     </contributor>
-    <created>2016-12-22T21:15:44</created>
-    <modified>2016-12-22T21:15:44</modified>
+    <created>2016-12-23T08:29:34</created>
+    <modified>2016-12-23T08:29:34</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
-  <library_images/>
+  <library_images>
+    <image id="CatTexture" name="CatTexture">
+      <init_from>/home/yoo2001818/Blender/CatTexture.png</init_from>
+    </image>
+  </library_images>
   <library_effects>
     <effect id="EyeballMat-effect">
       <profile_COMMON>
+        <newparam sid="CatTexture-surface">
+          <surface type="2D">
+            <init_from>CatTexture</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="CatTexture-sampler">
+          <sampler2D>
+            <source>CatTexture-surface</source>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
           <blinn>
             <emission>
@@ -23,7 +37,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.64 0.64 0.64 1</color>
+              <texture texture="CatTexture-sampler"/>
             </diffuse>
             <specular>
               <color sid="specular">0.8273916 0.8273916 0.8273916 1</color>
@@ -40,6 +54,16 @@
     </effect>
     <effect id="Catmat-effect">
       <profile_COMMON>
+        <newparam sid="CatTexture-surface">
+          <surface type="2D">
+            <init_from>CatTexture</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="CatTexture-sampler">
+          <sampler2D>
+            <source>CatTexture-surface</source>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
           <lambert>
             <emission>
@@ -49,7 +73,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.64 0.64 0.64 1</color>
+              <texture texture="CatTexture-sampler"/>
             </diffuse>
             <index_of_refraction>
               <float sid="index_of_refraction">1</float>

@@ -10,6 +10,7 @@ export default {
   document(data) {
     let result = {};
     this.flipAxis = data.asset.upAxis !== 'Y_UP';
+    console.log(data.images);
     result.geometries = (data.geometries || []).map(this.process.bind(this,
       'geometry'));
     console.log(result);
@@ -76,7 +77,6 @@ export default {
       }
       return { attributes, indices, material: polylist.material };
     });
-    console.log(result);
     return result;
   },
   vertex(data) {
