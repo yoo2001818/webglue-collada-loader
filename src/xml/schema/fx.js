@@ -107,6 +107,8 @@ export default {
     // TODO Cube texture
     init_cube: NOOP,
     init_from: 'string'
+  }, null, {
+    type: 'surface'
   }),
   sampler: hierarchy({
     source: 'string',
@@ -115,6 +117,8 @@ export default {
     minfilter: 'fxSamplerFilterCommon',
     magfilter: 'fxSamplerFilterCommon',
     mipfilter: 'fxSamplerFilterCommon'
+  }, null, {
+    type: 'sampler'
   }),
   material: hoist({
     instance_effect: 'instanceEffect'

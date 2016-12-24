@@ -68,7 +68,7 @@ export function createNamespace(createLocal, sidNecessary, overwrite = true) {
         frame.id = id;
       }
       frame.name = name;
-      if (createLocal) {
+      if (overwrite && createLocal) {
         frame.namespace = {};
       }
     },
@@ -80,6 +80,9 @@ export function createNamespace(createLocal, sidNecessary, overwrite = true) {
       if (frame.id != null) {
         this.namespace[frame.id] = data;
         if (overwrite) data.id = frame.id;
+      }
+      if (overwrite && createLocal) {
+        data.namespace = Object.assign({}, data.namespace, frame.namespace);
       }
       if (overwrite && frame.name != null) data.name = frame.name;
       return data;

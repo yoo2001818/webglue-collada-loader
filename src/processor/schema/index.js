@@ -6,15 +6,43 @@ const SEMANTIC_ATTRIBUTE_TABLE = {
   COLOR: 'aColor'
 };
 
+const MATERIAL_FIELDS = ['emission', 'ambient', 'diffuse', 'specular',
+  'reflective', 'transparent'];
+
 export default {
   document(data) {
     let result = {};
     this.flipAxis = data.asset.upAxis !== 'Y_UP';
-    console.log(data.images);
+    console.log(data);
     result.geometries = (data.geometries || []).map(this.process.bind(this,
       'geometry'));
+    result.materials = (data.materials || []).map(this.process.bind(this,
+      'material'));
     console.log(result);
     return result;
+  },
+  material(data) {
+    return this.resolve('effect', data.url);
+  },
+  effect(data) {
+    // TODO Ignore params for now
+    let { params, technique } = data;
+    MATERIAL_FIELDS.forEach(key => {
+      let value = technique[key];
+      if (value == null) return;
+      if (typeof value !== 'string') {
+        technique[key] = value.slice(0, 3);
+        return;
+      }
+      // 1. Resolve sampler
+      let sampler = params[value];
+      // 2. Resolve surface
+      let surface = params[sampler.source];
+      // 3. Resolve image (This is up to the user)
+      technique[key] = new Float32Array([1, 1, 1]);
+      technique[key + 'Map'] = surface.init_from;
+    });
+    return technique;
   },
   geometry(data) {
     // We only take polylists.
