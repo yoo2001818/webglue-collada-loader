@@ -103,7 +103,7 @@ export default {
           offset += vcount[i] * stride;
         }
       }
-      return { attributes, indices, material: polylist.material };
+      return { attributes, indices, metadata: { material: polylist.material }};
     });
     return result;
   },
