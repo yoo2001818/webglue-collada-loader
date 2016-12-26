@@ -6,10 +6,14 @@ import { mat3, mat4 } from 'gl-matrix';
 export default function collada(renderer) {
   const gl = renderer.gl;
   let data = loadCollada(require('../geom/cat.dae'));
-  let geom = renderer.geometries.create(channelGeom(data.geometries[1][0]));
+  let geom = renderer.geometries.create(
+    data.geometries.map(v => channelGeom(v[0])));
   let shader = renderer.shaders.create(
     require('../shader/phong.vert'),
     require('../shader/phong.frag')
+  );
+  let texture = renderer.textures.create(
+    require('../texture/CatTexture.png')
   );
   let model1Mat = mat4.create();
   let model1Normal = mat3.create();
@@ -22,19 +26,20 @@ export default function collada(renderer) {
         uMaterial: {
           ambient: material.ambient.map((v, i) => v * material.diffuse[i]),
           diffuse: material.diffuse,
-          specular: material.specular,
-          shininess: material.shininess,
-          reflectivity: material.model === 3 ? new Float32Array([
-            material.specular[0], material.specular[1], material.specular[2], 1
-          ]) : '#00000000'
-        }
+          specular: material.type === 'lambert' ?
+            new Float32Array([0, 0, 0]) :
+            material.specular,
+          shininess: material.type === 'lambert' ? 0 : material.shininess
+        },
+        uDiffuseMap: texture
       }
     };
   }
   let bakedMaterials = data.materials.map(v => bakeMaterial(v));
 
   let nodes = bakeMesh(geom, {
-    'Catmat-material': bakedMaterials[0]
+    'EyeballMat-material': bakedMaterials[0],
+    'Catmat-material': bakedMaterials[1]
   });
 
   return (delta, context) => {
@@ -50,7 +55,7 @@ export default function collada(renderer) {
       },
       uniforms: Object.assign({}, context.camera, {
         uPointLight: [{
-          position: [0, 1, 1],
+          position: [2, 2, 2],
           color: '#ffffff',
           intensity: [0.3, 0.8, 1.0, 0.00015]
         }]

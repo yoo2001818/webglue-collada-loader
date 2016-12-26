@@ -34,7 +34,7 @@
               <color sid="emission">0.42 0.42 0.42 1</color>
             </emission>
             <ambient>
-              <color sid="ambient">0 0 0 1</color>
+              <color sid="ambient">0.8 0.8 0.8 1</color>
             </ambient>
             <diffuse>
               <texture texture="CatTexture-sampler"/>
@@ -70,7 +70,7 @@
               <color sid="emission">0 0 0 1</color>
             </emission>
             <ambient>
-              <color sid="ambient">0 0 0 1</color>
+              <color sid="ambient">0.8 0.8 0.8 1</color>
             </ambient>
             <diffuse>
               <texture texture="CatTexture-sampler"/>
