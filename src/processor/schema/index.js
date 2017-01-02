@@ -26,6 +26,10 @@ export default {
       this.process.bind(this, 'geometry'));
     result.materials = arrayToObject(data.materials || [],
       this.process.bind(this, 'material'));
+    result.cameras = arrayToObject(data.cameras || [],
+      this.process.bind(this, 'camera'));
+    result.lights = arrayToObject(data.lights || [],
+      this.process.bind(this, 'light'));
     result.scene = this.resolve('visualScene', data.scene.visualScene);
     console.log(result);
     return result;
@@ -70,6 +74,12 @@ export default {
       result.materials[key] = data.materials[key].target.slice(1);
     }
     return result;
+  },
+  camera(data) {
+    return data.optics;
+  },
+  light(data) {
+    return data;
   },
   material(data) {
     return this.resolve('effect', data.url);
