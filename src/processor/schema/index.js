@@ -9,16 +9,66 @@ const SEMANTIC_ATTRIBUTE_TABLE = {
 const MATERIAL_FIELDS = ['emission', 'ambient', 'diffuse', 'specular',
   'reflective', 'transparent'];
 
+function arrayToObject(array, callback) {
+  let result = {};
+  array.forEach((v, i) => {
+    result[v.id || v.name || i] = callback(v);
+  });
+  return result;
+}
+
 export default {
   document(data) {
     let result = {};
     this.flipAxis = data.asset.upAxis !== 'Y_UP';
     console.log(data);
-    result.geometries = (data.geometries || []).map(this.process.bind(this,
-      'geometry'));
-    result.materials = (data.materials || []).map(this.process.bind(this,
-      'material'));
+    result.geometries = arrayToObject(data.geometries || [],
+      this.process.bind(this, 'geometry'));
+    result.materials = arrayToObject(data.materials || [],
+      this.process.bind(this, 'material'));
+    result.scene = this.resolve('visualScene', data.scene.visualScene);
     console.log(result);
+    return result;
+  },
+  node(data, parent) {
+    let result = {};
+    if (parent != null) result.parent = parent;
+    if (data.children != null) {
+      result.children = data.children.map(v => this.process('node', v, result));
+    }
+    result.type = data.type;
+    result.id = data.id;
+    result.name = data.name;
+    if (data.cameras != null) {
+      result.cameras = data.cameras.map(v => this.process('binding', v));
+    }
+    if (data.lights != null) {
+      result.lights = data.lights.map(v => this.process('binding', v));
+    }
+    if (data.geometries != null) {
+      result.geometries = data.geometries.map(
+        v => this.process('bindingGeom', v));
+    }
+    if (data.controllers != null) {
+      result.controllers = data.controllers.map(
+        v => this.process('bindingGeom', v));
+    }
+    return result;
+  },
+  visualScene(data) {
+    return data.children.map(v => this.process('node', v));
+  },
+  binding(data) {
+    return data.url.slice(1);
+  },
+  bindingGeom(data) {
+    let result = {};
+    result.name = data.name;
+    // Map materials
+    result.materials = {};
+    for (let key in data.materials) {
+      result.materials[key] = data.materials[key].target.slice(1);
+    }
     return result;
   },
   material(data) {

@@ -1,8 +1,8 @@
 import Parser from './xml/parser';
 import xmlSchema from './xml/schema';
 
-import Processor from './processor';
 import processorSchema from './processor/schema';
+import Processor from './processor';
 
 export default function loadCollada(data) {
   let parser = new Parser(xmlSchema, 'initial');

@@ -1,12 +1,12 @@
 import loadCollada from '../../src';
-import channelGeom from 'webglue/lib/geom/channel/channelOld';
-import bakeMesh from 'webglue/lib/util/bakeMesh';
-import { mat3, mat4 } from 'gl-matrix';
+// import channelGeom from 'webglue/lib/geom/channel/channelOld';
+// import bakeMesh from 'webglue/lib/util/bakeMesh';
+// import { mat3, mat4 } from 'gl-matrix';
 
-export default function collada(renderer) {
-  const gl = renderer.gl;
-  let data = loadCollada(require('../geom/cat.dae'));
-  let geom = renderer.geometries.create(
+export default function collada() {
+  // const gl = renderer.gl;
+  loadCollada(require('../geom/multiMaterial.dae'));
+  /* let geom = renderer.geometries.create(
     data.geometries.map(v => channelGeom(v[0])));
   let shader = renderer.shaders.create(
     require('../shader/phong.vert'),
@@ -68,5 +68,6 @@ export default function collada(renderer) {
         passes: nodes
       }]
     });
-  };
+  }; */
+  return () => {};
 }
