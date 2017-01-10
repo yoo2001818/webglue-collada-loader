@@ -21,7 +21,6 @@ export default {
   document(data) {
     let result = {};
     this.flipAxis = data.asset.upAxis !== 'Y_UP';
-    console.log(data);
     result.geometries = arrayToObject(data.geometries || [],
       this.process.bind(this, 'geometry'));
     result.materials = arrayToObject(data.materials || [],
