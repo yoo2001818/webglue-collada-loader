@@ -33,7 +33,7 @@ export default {
         falloff_angle: rename('falloffAngle', 'floadSid'),
         falloff_exponent: rename('falloffExponent', 'floadSid'),
       }, null, {
-        type: 'point',
+        type: 'spot',
         attenuationConstant: 1,
         attenuationLinear: 0,
         zfar: 0,

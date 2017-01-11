@@ -56,6 +56,7 @@ export default {
       result.controllers = data.controllers.map(
         v => this.process('bindingGeom', v));
     }
+    result.matrix = data.matrix;
     return result;
   },
   visualScene(data) {
