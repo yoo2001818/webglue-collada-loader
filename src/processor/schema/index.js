@@ -9,10 +9,11 @@ const SEMANTIC_ATTRIBUTE_TABLE = {
 const MATERIAL_FIELDS = ['emission', 'ambient', 'diffuse', 'specular',
   'reflective', 'transparent'];
 
-function arrayToObject(array, callback) {
+function arrayToObject(array, callback, field = null) {
   let result = {};
   array.forEach((v, i) => {
-    result[v.id || v.name || i] = callback(v);
+    if (field != null) result[v[field]] = callback(v);
+    else result[v.id || v.name || i] = callback(v);
   });
   return result;
 }
@@ -22,7 +23,7 @@ export default {
     let result = {};
     this.flipAxis = data.asset.upAxis !== 'Y_UP';
     result.geometries = arrayToObject(data.geometries || [],
-      this.process.bind(this, 'geometry'));
+      this.process.bind(this, 'geometry'), 'name');
     result.materials = arrayToObject(data.materials || [],
       this.process.bind(this, 'material'));
     result.cameras = arrayToObject(data.cameras || [],

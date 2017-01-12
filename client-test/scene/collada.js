@@ -1,24 +1,16 @@
 import loadCollada from '../../src';
-// import channelGeom from 'webglue/lib/geom/channel/channelOld';
+import render from '../../src/render';
+import channelGeom from 'webglue/lib/geom/channel/channelOld';
 // import bakeMesh from 'webglue/lib/util/bakeMesh';
 // import { mat3, mat4 } from 'gl-matrix';
 
-export default function collada() {
+export default function collada(renderer) {
   // const gl = renderer.gl;
-  loadCollada(require('../geom/multiMaterial.dae'));
-  /* let geom = renderer.geometries.create(
-    data.geometries.map(v => channelGeom(v[0])));
+  let collada = loadCollada(require('../geom/multiMaterial.dae'));
   let shader = renderer.shaders.create(
     require('../shader/phong.vert'),
     require('../shader/phong.frag')
   );
-  let texture = renderer.textures.create(
-    require('../texture/CatTexture.png')
-  );
-  let model1Mat = mat4.create();
-  let model1Normal = mat3.create();
-
-  // Bake Material to WebglueRenderNode
   function bakeMaterial(material) {
     return {
       shader,
@@ -30,11 +22,31 @@ export default function collada() {
             new Float32Array([0, 0, 0]) :
             material.specular,
           shininess: material.type === 'lambert' ? 0 : material.shininess
-        },
-        uDiffuseMap: texture
+        }
       }
     };
   }
+  // Bake materials
+  let bakedMaterials = {};
+  for (let key in collada.materials) {
+    bakedMaterials[key] = bakeMaterial(collada.materials[key]);
+  }
+  // Bake geometries
+  let bakedGeometries = {};
+  for (let key in collada.geometries) {
+    bakedGeometries[key] = renderer.geometries.create(
+      collada.geometries[key].map(v => channelGeom(v)));
+  }
+  render(collada, bakedGeometries, bakedMaterials);
+  /* let geom = renderer.geometries.create(
+    data.geometries.map(v => channelGeom(v[0])));
+  let texture = renderer.textures.create(
+    require('../texture/CatTexture.png')
+  );
+  let model1Mat = mat4.create();
+  let model1Normal = mat3.create();
+
+  // Bake Material to WebglueRenderNode
   let bakedMaterials = data.materials.map(v => bakeMaterial(v));
 
   let nodes = bakeMesh(geom, {
