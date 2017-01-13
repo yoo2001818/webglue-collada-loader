@@ -6,10 +6,15 @@ import channelGeom from 'webglue/lib/geom/channel/channelOld';
 
 export default function collada(renderer) {
   const gl = renderer.gl;
-  let collada = loadCollada(require('../geom/multiMaterial.dae'));
+  renderer.shaders.governors.eqLength = {
+    checker: (shader, current) =>
+      shader === (current == null ? 0 : current.length),
+    allocator: current => current == null ? 0 : current.length
+  };
+  let collada = loadCollada(require('../geom/theaterbuilding.dae'));
   let shader = renderer.shaders.create(
-    require('../shader/normal.vert'),
-    require('../shader/normal.frag')
+    require('../shader/phong.vert'),
+    require('../shader/phong.frag')
   );
   function bakeMaterial(material) {
     return {

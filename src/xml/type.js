@@ -97,9 +97,12 @@ export const registerSidOptional = createNamespace(false, false, true);
 export const handleInstance = {
   push(node, frame) {
     registerSidOptional.push.call(this, node, frame);
-    frame.data.url = node.attributes.url;
+    frame.url = node.attributes.url;
   },
-  pop: registerSidOptional.pop
+  pop(data, frame) {
+    frame.data.url = frame.url;
+    return registerSidOptional.pop.call(this, frame.data, frame);
+  }
 };
 
 export function addTrigger(schema, triggers) {

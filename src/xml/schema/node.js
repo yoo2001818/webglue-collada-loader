@@ -25,7 +25,7 @@ export default {
       return mat4.lookAt(tmpMat4, eye, center, up);
     }),
     matrix: matrixOp(input => {
-      return mat4.copy(tmpMat4, input);
+      return mat4.transpose(tmpMat4, input);
     }),
     rotate: matrixOp(input => {
       return mat4.fromRotation(tmpMat4,

@@ -1,3 +1,5 @@
+import { mat4 } from 'gl-matrix';
+
 const SEMANTIC_ATTRIBUTE_TABLE = {
   POSITION: 'aPosition',
   NORMAL: 'aNormal',
@@ -9,11 +11,10 @@ const SEMANTIC_ATTRIBUTE_TABLE = {
 const MATERIAL_FIELDS = ['emission', 'ambient', 'diffuse', 'specular',
   'reflective', 'transparent'];
 
-function arrayToObject(array, callback, field = null) {
+function arrayToObject(array, callback) {
   let result = {};
   array.forEach((v, i) => {
-    if (field != null) result[v[field]] = callback(v);
-    else result[v.id || v.name || i] = callback(v);
+    result[v.id || v.name || i] = callback(v);
   });
   return result;
 }
@@ -23,7 +24,7 @@ export default {
     let result = {};
     this.flipAxis = data.asset.upAxis !== 'Y_UP';
     result.geometries = arrayToObject(data.geometries || [],
-      this.process.bind(this, 'geometry'), 'name');
+      this.process.bind(this, 'geometry'));
     result.materials = arrayToObject(data.materials || [],
       this.process.bind(this, 'material'));
     result.cameras = arrayToObject(data.cameras || [],
@@ -57,7 +58,15 @@ export default {
       result.controllers = data.controllers.map(
         v => this.process('bindingGeom', v));
     }
-    result.matrix = data.matrix;
+    result.matrix = mat4.clone(data.matrix);
+    if (this.flipAxis) {
+      mat4.multiply(result.matrix, [
+        1, 0, 0, 0,
+        0, 0, -1, 0,
+        0, 1, 0, 0,
+        0, 0, 0, 1
+      ], result.matrix);
+    }
     return result;
   },
   visualScene(data) {
@@ -68,7 +77,7 @@ export default {
   },
   bindingGeom(data) {
     let result = {};
-    result.name = data.name;
+    result.url = data.url.slice(1);
     // Map materials
     result.materials = {};
     for (let key in data.materials) {
@@ -183,7 +192,7 @@ export default {
       source = source.slice(offset, offset + count * stride);
     }
     // If X / Y / Z is provided, we need to flip the axis
-    if (this.flipAxis && options.params.indexOf('X') !== -1) {
+    /* if (this.flipAxis && options.params.indexOf('X') !== -1) {
       if (source.subarray != null) source = source.slice();
       for (let i = 0; i < source.length; i += 3) {
         // Flip Y, Z, while inverting Y value
@@ -191,7 +200,7 @@ export default {
         source[i + 1] = source[i + 2];
         source[i + 2] = tmp;
       }
-    }
+    } */
     return { source, axis: stride };
   },
   raw(data) {

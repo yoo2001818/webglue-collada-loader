@@ -8,7 +8,11 @@ export default function render(collada, geometries, materials) {
   // Same for geometries - users must provide webglue geometries.
   const { cameras, lights, scene } = collada;
   let lightNodes = {
-    ambient: [], point: [], directional: [], spot: []
+    ambient: [], point: [], directional: [{
+      direction: [1/Math.sqrt(2), 1/Math.sqrt(2), 0],
+      color: '#ffffff',
+      intensity: [1, 1, 1]
+    }], spot: []
   };
   let renderNodes = [];
   function bakeNode(node, parentMatrix) {
@@ -49,7 +53,7 @@ export default function render(collada, geometries, materials) {
           for (let key in geometry.materials) {
             materialIndex[key] = materials[geometry.materials[key]];
           }
-          return bakeMesh(geometries[geometry.name], materialIndex);
+          return bakeMesh(geometries[geometry.url], materialIndex);
         })
       };
       renderNodes.push(renderNode);
@@ -63,7 +67,8 @@ export default function render(collada, geometries, materials) {
   // Bake camera / light information
   return {
     uniforms: {
-      uPointLight: lightNodes.point
+      uPointLight: lightNodes.point,
+      uDirectionalLight: lightNodes.directional
     },
     passes: renderNodes
   };
