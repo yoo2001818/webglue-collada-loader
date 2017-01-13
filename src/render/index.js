@@ -60,4 +60,11 @@ export default function render(collada, geometries, materials) {
   }
   scene.forEach(node => bakeNode(node));
   console.log(renderNodes, lightNodes);
+  // Bake camera / light information
+  return {
+    uniforms: {
+      uPointLight: lightNodes.point
+    },
+    passes: renderNodes
+  };
 }

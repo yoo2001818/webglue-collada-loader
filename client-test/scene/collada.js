@@ -5,11 +5,11 @@ import channelGeom from 'webglue/lib/geom/channel/channelOld';
 // import { mat3, mat4 } from 'gl-matrix';
 
 export default function collada(renderer) {
-  // const gl = renderer.gl;
+  const gl = renderer.gl;
   let collada = loadCollada(require('../geom/multiMaterial.dae'));
   let shader = renderer.shaders.create(
-    require('../shader/phong.vert'),
-    require('../shader/phong.frag')
+    require('../shader/normal.vert'),
+    require('../shader/normal.frag')
   );
   function bakeMaterial(material) {
     return {
@@ -37,7 +37,20 @@ export default function collada(renderer) {
     bakedGeometries[key] = renderer.geometries.create(
       collada.geometries[key].map(v => channelGeom(v)));
   }
-  render(collada, bakedGeometries, bakedMaterials);
+  let world = render(collada, bakedGeometries, bakedMaterials);
+  console.log(world);
+  return (delta, context) => {
+    renderer.render({
+      options: {
+        clearColor: new Float32Array([0, 0, 0, 1]),
+        clearDepth: 1,
+        cull: gl.BACK,
+        depth: gl.LEQUAL
+      },
+      uniforms: context.camera,
+      passes: world
+    });
+  };
   /* let geom = renderer.geometries.create(
     data.geometries.map(v => channelGeom(v[0])));
   let texture = renderer.textures.create(
@@ -81,5 +94,4 @@ export default function collada(renderer) {
       }]
     });
   }; */
-  return () => {};
 }
