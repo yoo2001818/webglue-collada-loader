@@ -11,7 +11,7 @@ export default function collada(renderer) {
       shader === (current == null ? 0 : current.length),
     allocator: current => current == null ? 0 : current.length
   };
-  let collada = loadCollada(require('../geom/theaterbuilding.dae'));
+  let collada = loadCollada(require('../geom/pencil.dae'));
   let shader = renderer.shaders.create(
     require('../shader/phong.vert'),
     require('../shader/phong.frag')
@@ -47,7 +47,7 @@ export default function collada(renderer) {
   return (delta, context) => {
     renderer.render({
       options: {
-        clearColor: new Float32Array([0, 0, 0, 1]),
+        clearColor: new Float32Array([255, 255, 255, 1]),
         clearDepth: 1,
         cull: gl.BACK,
         depth: gl.LEQUAL
