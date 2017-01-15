@@ -8,11 +8,7 @@ export default function render(collada, geometries, materials) {
   // Same for geometries - users must provide webglue geometries.
   const { cameras, lights, scene } = collada;
   let lightNodes = {
-    ambient: [], point: [], directional: [{
-      direction: [1/Math.sqrt(2), 1/Math.sqrt(2), 0],
-      color: '#ffffff',
-      intensity: [1, 1, 1]
-    }], spot: []
+    ambient: [], point: [], directional: [], spot: []
   };
   let renderNodes = [];
   function bakeNode(node, parentMatrix) {
@@ -57,6 +53,10 @@ export default function render(collada, geometries, materials) {
         })
       };
       renderNodes.push(renderNode);
+    }
+    // Add controllers
+    if (node.controllers != null) {
+      console.log(node.controllers);
     }
     if (node.children != null) {
       node.children.forEach(node => bakeNode(node, matrix));
