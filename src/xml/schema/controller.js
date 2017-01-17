@@ -1,5 +1,5 @@
-import { attributes, hierarchy, hoist, rename, registerId, unwrap,
-  multipleMap, handleInstance } from '../type';
+import { hierarchy, hoist, rename, registerId, unwrap,
+  multiple, multipleMap, handleInstance } from '../type';
 
 export default {
   controller: hoist({
@@ -8,11 +8,10 @@ export default {
       source: rename('sources', multipleMap('source',
         (data, frame) => frame.id)),
       joints: hoist({
-        input: multipleMap(attributes(), (data, frame) => frame.data.semantic)
+        input: multiple('inputUnshared'),
       }),
       vertex_weights: rename('weights', hierarchy({
-        input: rename('inputs', multipleMap(attributes(),
-          (data, frame) => frame.data.semantic)),
+        input: multiple('inputShared'),
         vcount: 'intArray',
         v: 'intArray'
       }))

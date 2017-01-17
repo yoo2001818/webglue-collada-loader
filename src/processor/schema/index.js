@@ -31,6 +31,8 @@ export default {
       this.process.bind(this, 'camera'));
     result.lights = arrayToObject(data.lights || [],
       this.process.bind(this, 'light'));
+    result.controllers = arrayToObject(data.controllers || [],
+      this.process.bind(this, 'controller'));
     result.scene = this.resolve('visualScene', data.scene.visualScene);
     console.log(result);
     return result;
@@ -83,6 +85,69 @@ export default {
     for (let key in data.materials) {
       result.materials[key] = data.materials[key].target.slice(1);
     }
+    return result;
+  },
+  controller(data) {
+    let result = {};
+    // TODO Handle geometries with multiple materials
+    let source = this.resolve('geometry', data.source)[0];
+
+    // Build vertex weights table first.
+    const { weights } = data;
+
+    let skinWeights, skinIndices;
+    let stride = weights.input.length;
+
+    weights.input.forEach(channel => {
+      let offset = channel.offset;
+      let { source } = this.resolve('source', channel.source);
+      // TODO This is a exactly copy-pasted one - It should be refactored.
+      if (channel.semantic === 'JOINT') {
+        let output = [];
+        for (let i = 0; i < weights.vcount.length; ++i) {
+          let count = weights.vcount[i];
+          for (let j = 0; j < count; ++j) {
+            // TODO Sort them using weights
+            // Don't read actual value of source - it's string.
+            if (j < 4) output.push(weights.v[offset]);
+            offset += stride;
+          }
+          // Fill the rest of values
+          for (let j = count; j < 4; ++j) output.push(-1);
+        }
+        skinIndices = new Int16Array(output);
+      } else {
+        let output = [];
+        for (let i = 0; i < weights.vcount.length; ++i) {
+          let count = weights.vcount[i];
+          for (let j = 0; j < count; ++j) {
+            // TODO Sort them using weights
+            if (j < 4) output.push(source[weights.v[offset]]);
+            offset += stride;
+          }
+          // Fill the rest of values
+          for (let j = count; j < 4; ++j) output.push(0);
+        }
+        skinWeights = new Float32Array(output);
+      }
+    });
+
+    // Steal aPosition's indices array. Since aPosition is specified in
+    // 'vertex' section of COLLADA document, it must have correct vertex
+    // indices. We've already built skin weights / indices with vertex ID at
+    // this point - so we can simply copy aPosition's indices array.
+    let newGeom = Object.assign({}, source, {
+      attributes: Object.assign({}, source.attributes, {
+        aSkinIndices: { data: skinIndices, axis: 4 },
+        aSkinWeights: { data: skinWeights, axis: 4 }
+      }),
+      indices: Object.assign({}, source.indices, {
+        aSkinIndices: source.indices.aPosition,
+        aSkinWeights: source.indices.aPosition
+      })
+    });
+    // Done!
+    result.geometry = newGeom;
     return result;
   },
   camera(data) {
