@@ -89,8 +89,7 @@ export default {
   },
   controller(data) {
     let result = {};
-    // TODO Handle geometries with multiple materials
-    let source = this.resolve('geometry', data.source)[0];
+    let sourceList = this.resolve('geometry', data.source);
 
     // Build vertex weights table first.
     const { weights } = data;
@@ -136,7 +135,7 @@ export default {
     // 'vertex' section of COLLADA document, it must have correct vertex
     // indices. We've already built skin weights / indices with vertex ID at
     // this point - so we can simply copy aPosition's indices array.
-    let newGeom = Object.assign({}, source, {
+    let newGeom = sourceList.map(source => Object.assign({}, source, {
       attributes: Object.assign({}, source.attributes, {
         aSkinIndices: { data: skinIndices, axis: 4 },
         aSkinWeights: { data: skinWeights, axis: 4 }
@@ -145,7 +144,7 @@ export default {
         aSkinIndices: source.indices.aPosition,
         aSkinWeights: source.indices.aPosition
       })
-    });
+    }));
     // Done!
     result.geometry = newGeom;
     return result;

@@ -13,8 +13,8 @@ export default function armature(renderer) {
   };
   let collada = loadCollada(require('../geom/cat.dae'));
   let shader = renderer.shaders.create(
-    require('../shader/phong.vert'),
-    require('../shader/phong.frag')
+    require('../shader/armature.vert'),
+    require('../shader/normal.frag')
   );
   function bakeMaterial(material) {
     return {
@@ -41,6 +41,11 @@ export default function armature(renderer) {
   for (let key in collada.geometries) {
     bakedGeometries[key] = renderer.geometries.create(
       collada.geometries[key].map(v => channelGeom(v)));
+  }
+  // Bake controllers
+  for (let key in collada.controllers) {
+    bakedGeometries[key] = renderer.geometries.create(
+      collada.controllers[key].geometry.map(v => channelGeom(v)));
   }
   let world = render(collada, bakedGeometries, bakedMaterials);
   console.log(world);

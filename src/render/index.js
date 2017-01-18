@@ -6,6 +6,7 @@ export default function render(collada, geometries, materials) {
   // Since webglue-collada-loader doesn't provide any default shaders,
   // users must pre-bake the materials into render nodes.
   // Same for geometries - users must provide webglue geometries.
+  // Controllers must be provided in geometries object.
   const { cameras, lights, scene } = collada;
   let lightNodes = {
     ambient: [], point: [], directional: [], spot: []
@@ -56,7 +57,24 @@ export default function render(collada, geometries, materials) {
     }
     // Add controllers
     if (node.controllers != null) {
-      console.log(node.controllers);
+      // Treat controllers as regular geometries for now.
+      let normalMat = mat3.create();
+      mat3.normalFromMat4(normalMat, matrix);
+      let renderNode = {
+        uniforms: {
+          uModel: matrix,
+          uNormal: normalMat
+        },
+        passes: node.controllers.map(geometry => {
+          // Generate material index
+          let materialIndex = {};
+          for (let key in geometry.materials) {
+            materialIndex[key] = materials[geometry.materials[key]];
+          }
+          return bakeMesh(geometries[geometry.url], materialIndex);
+        })
+      };
+      renderNodes.push(renderNode);
     }
     if (node.children != null) {
       node.children.forEach(node => bakeNode(node, matrix));
