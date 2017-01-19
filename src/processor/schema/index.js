@@ -94,42 +94,46 @@ export default {
     // Build vertex weights table first.
     const { weights } = data;
 
-    let skinWeights, skinIndices;
+    let weightInput;
+    let weightOffset, indexOffset;
     let stride = weights.input.length;
 
     weights.input.forEach(channel => {
       let offset = channel.offset;
       let { source } = this.resolve('source', channel.source);
-      // TODO This is a exactly copy-pasted one - It should be refactored.
       if (channel.semantic === 'JOINT') {
-        let output = [];
-        for (let i = 0; i < weights.vcount.length; ++i) {
-          let count = weights.vcount[i];
-          for (let j = 0; j < count; ++j) {
-            // TODO Sort them using weights
-            // Don't read actual value of source - it's string.
-            if (j < 4) output.push(weights.v[offset]);
-            offset += stride;
-          }
-          // Fill the rest of values
-          for (let j = count; j < 4; ++j) output.push(-1);
-        }
-        skinIndices = new Int16Array(output);
-      } else {
-        let output = [];
-        for (let i = 0; i < weights.vcount.length; ++i) {
-          let count = weights.vcount[i];
-          for (let j = 0; j < count; ++j) {
-            // TODO Sort them using weights
-            if (j < 4) output.push(source[weights.v[offset]]);
-            offset += stride;
-          }
-          // Fill the rest of values
-          for (let j = count; j < 4; ++j) output.push(0);
-        }
-        skinWeights = new Float32Array(output);
+        indexOffset = offset;
+      } else if (channel.semantic == 'WEIGHT') {
+        weightOffset = offset;
+        weightInput = source;
       }
     });
+    let offset = 0;
+    let skinIndices = new Int16Array(weights.vcount.length * 4);
+    let skinWeights = new Float32Array(weights.vcount.length * 4);
+    for (let i = 0; i < weights.vcount.length; ++i) {
+      let count = weights.vcount[i];
+      // Read all offsets and push them to indices.
+      let vertexData = [];
+      for (let j = 0; j < count; ++j) {
+        vertexData.push({
+          indices: weights.v[offset * stride + indexOffset],
+          weights: weightInput[weights.v[offset * stride + weightOffset]]
+        });
+        offset ++;
+      }
+      // Then, sort the arrays using offsets
+      vertexData.sort((a, b) => b.weights - a.weights);
+      // Create dummy entries if required.
+      for (let j = vertexData.length; j < 4; ++j) {
+        vertexData.push({ indices: -1, weights: 0 });
+      }
+      // Push the output into TypedArray data.
+      for (let j = 0; j < 4; ++j) {
+        skinIndices[i * 4 + j] = vertexData[j].indices;
+        skinWeights[i * 4 + j] = vertexData[j].weights;
+      }
+    }
 
     // Steal aPosition's indices array. Since aPosition is specified in
     // 'vertex' section of COLLADA document, it must have correct vertex
