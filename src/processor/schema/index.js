@@ -128,10 +128,15 @@ export default {
       for (let j = vertexData.length; j < 4; ++j) {
         vertexData.push({ indices: -1, weights: 0 });
       }
+      let weightSum = 0;
+      // Count total sum of weights.
+      for (let j = 0; j < 4; ++j) {
+        weightSum += vertexData[j].weights;
+      }
       // Push the output into TypedArray data.
       for (let j = 0; j < 4; ++j) {
         skinIndices[i * 4 + j] = vertexData[j].indices;
-        skinWeights[i * 4 + j] = vertexData[j].weights;
+        skinWeights[i * 4 + j] = vertexData[j].weights / weightSum;
       }
     }
 
