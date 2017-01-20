@@ -94,7 +94,7 @@ export default {
     // Build vertex weights table first.
     const { weights } = data;
 
-    let weightInput;
+    let weightInput, indexInput;
     let weightOffset, indexOffset;
     let stride = weights.input.length;
 
@@ -103,6 +103,7 @@ export default {
       let { source } = this.resolve('source', channel.source);
       if (channel.semantic === 'JOINT') {
         indexOffset = offset;
+        indexInput = source;
       } else if (channel.semantic == 'WEIGHT') {
         weightOffset = offset;
         weightInput = source;
@@ -172,6 +173,14 @@ export default {
     }));
     // Done!
     result.geometry = newGeom;
+    // We need to create node names / bind matrices array. Nothing can be done
+    // at this level, since root elements are specified in the controller.
+    // Map each indexInput to bindMatrices.
+    let bindMatrices = this.resolve('source',
+      data.joints.find(v => v.semantic === 'INV_BIND_MATRIX').source).source;
+    result.joints = indexInput.map((name, i) => ({
+      name, bindMatrix: bindMatrices.subarray(i * 16, i * 16 + 16)
+    }));
     return result;
   },
   camera(data) {
