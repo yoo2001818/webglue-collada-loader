@@ -4,7 +4,7 @@ import { hierarchy, hoist, rename, registerId, unwrap,
 export default {
   controller: hoist({
     skin: hierarchy({
-      bindShapeMatrix: 'floatArray',
+      bind_shape_matrix: rename('bindShape', 'floatArray'),
       source: rename('sources', multipleMap('source',
         (data, frame) => frame.id)),
       joints: hoist({

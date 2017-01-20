@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { vec3, mat4 } from 'gl-matrix';
 
 const SEMANTIC_ATTRIBUTE_TABLE = {
   POSITION: 'aPosition',
@@ -144,8 +144,24 @@ export default {
     // 'vertex' section of COLLADA document, it must have correct vertex
     // indices. We've already built skin weights / indices with vertex ID at
     // this point - so we can simply copy aPosition's indices array.
+
+    // However, we need to recalculate aPosition because we need to multiply
+    // them with bind shape matrix.
+    // Since COLLADA uses row-major order, we need to convert them to
+    // column-major order.
+    let bindShape = mat4.create();
+    mat4.transpose(bindShape, data.bindShape);
     let newGeom = sourceList.map(source => Object.assign({}, source, {
       attributes: Object.assign({}, source.attributes, {
+        aPosition: ((source) => {
+          let output = new Float32Array(source.data.length);
+          for (let offset = 0; offset < output.length; offset += source.axis) {
+            let point = source.data.subarray(offset, offset + 3);
+            let outPoint = output.subarray(offset, offset + 3);
+            vec3.transformMat4(outPoint, point, bindShape);
+          }
+          return { data: output, axis: source.axis };
+        })(source.attributes.aPosition),
         aSkinIndices: { data: skinIndices, axis: 4 },
         aSkinWeights: { data: skinWeights, axis: 4 }
       }),
