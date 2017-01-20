@@ -58,7 +58,7 @@ export default {
     }
     if (data.controllers != null) {
       result.controllers = data.controllers.map(
-        v => this.process('bindingGeom', v));
+        v => this.process('bindingController', v));
     }
     result.matrix = mat4.clone(data.matrix);
     if (this.flipAxis) {
@@ -85,6 +85,18 @@ export default {
     for (let key in data.materials) {
       result.materials[key] = data.materials[key].target.slice(1);
     }
+    return result;
+  },
+  bindingController(data) {
+    let result = {};
+    result.url = data.url.slice(1);
+    // Map materials
+    result.materials = {};
+    for (let key in data.materials) {
+      result.materials[key] = data.materials[key].target.slice(1);
+    }
+    // Map root node
+    result.skeleton = this.resolve('node', data.skeleton);
     return result;
   },
   controller(data) {
@@ -127,7 +139,7 @@ export default {
       vertexData.sort((a, b) => b.weights - a.weights);
       // Create dummy entries if required.
       for (let j = vertexData.length; j < 4; ++j) {
-        vertexData.push({ indices: -1, weights: 0 });
+        vertexData.push({ indices: 65535, weights: 0 });
       }
       let weightSum = 0;
       // Count total sum of weights.

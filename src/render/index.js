@@ -1,13 +1,28 @@
 import { vec3, mat3, mat4 } from 'gl-matrix';
 import bakeMesh from 'webglue/lib/util/bakeMesh';
 
+function lookupSkeleton(lut, node, parentMatrix) {
+  // Calculate matrix
+  let localMatrix = node.matrix;
+  let matrix = localMatrix;
+  if (parentMatrix != null) {
+    matrix = mat4.create();
+    mat4.multiply(matrix, parentMatrix, localMatrix);
+  }
+  if (lut[node.id] != null) mat4.copy(lut[node.id], matrix);
+  if (lut[node.sid] != null) mat4.copy(lut[node.sid], matrix);
+  if (node.children != null) {
+    node.children.forEach(node => lookupSkeleton(lut, node, matrix));
+  }
+}
+
 export default function render(collada, geometries, materials) {
   // Bake Collada scene to render nodes.
   // Since webglue-collada-loader doesn't provide any default shaders,
   // users must pre-bake the materials into render nodes.
   // Same for geometries - users must provide webglue geometries.
   // Controllers must be provided in geometries object.
-  const { cameras, lights, scene } = collada;
+  const { cameras, lights, controllers, scene } = collada;
   let lightNodes = {
     ambient: [], point: [], directional: [], spot: []
   };
@@ -65,13 +80,30 @@ export default function render(collada, geometries, materials) {
           uModel: matrix,
           uNormal: normalMat
         },
-        passes: node.controllers.map(geometry => {
+        passes: node.controllers.map(controller => {
+          // We need to create bind matrix; This can be done more efficiently,
+          // but, this is using a slow method.
+          let lookupTable = {};
+          let controllerObj = controllers[controller.url];
+          let matrices = controllerObj.joints.map(joint => {
+            let output = mat4.clone(joint.bindMatrix);
+            lookupTable[joint.name] = output;
+            return output;
+          });
+          // Look up child objects to create matrix.
+          lookupSkeleton(lookupTable, controller.skeleton);
+          console.log(matrices);
           // Generate material index
           let materialIndex = {};
-          for (let key in geometry.materials) {
-            materialIndex[key] = materials[geometry.materials[key]];
+          for (let key in controller.materials) {
+            materialIndex[key] = materials[controller.materials[key]];
           }
-          return bakeMesh(geometries[geometry.url], materialIndex);
+          return {
+            uniforms: {
+              uBindMatrices: matrices
+            },
+            passes: bakeMesh(geometries[controller.url], materialIndex)
+          };
         })
       };
       renderNodes.push(renderNode);
