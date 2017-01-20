@@ -9,8 +9,10 @@ function lookupSkeleton(lut, node, parentMatrix) {
     matrix = mat4.create();
     mat4.multiply(matrix, parentMatrix, localMatrix);
   }
-  if (lut[node.id] != null) mat4.copy(lut[node.id], matrix);
-  if (lut[node.sid] != null) mat4.copy(lut[node.sid], matrix);
+  if (lut[node.id] != null) mat4.multiply(lut[node.id], matrix, lut[node.id]);
+  if (lut[node.sid] != null) {
+    mat4.multiply(lut[node.sid], matrix, lut[node.sid]);
+  }
   if (node.children != null) {
     node.children.forEach(node => lookupSkeleton(lut, node, matrix));
   }
@@ -22,7 +24,7 @@ export default function render(collada, geometries, materials) {
   // users must pre-bake the materials into render nodes.
   // Same for geometries - users must provide webglue geometries.
   // Controllers must be provided in geometries object.
-  const { cameras, lights, controllers, scene } = collada;
+  const { cameras, lights, controllers, scene, flipAxis } = collada;
   let lightNodes = {
     ambient: [], point: [], directional: [], spot: []
   };
@@ -112,7 +114,12 @@ export default function render(collada, geometries, materials) {
       node.children.forEach(node => bakeNode(node, matrix));
     }
   }
-  scene.forEach(node => bakeNode(node));
+  scene.forEach(node => bakeNode(node, flipAxis && [
+    1, 0, 0, 0,
+    0, 0, -1, 0,
+    0, 1, 0, 0,
+    0, 0, 0, 1
+  ]));
   console.log(renderNodes, lightNodes);
   // Bake camera / light information
   return {

@@ -22,7 +22,7 @@ function arrayToObject(array, callback) {
 export default {
   document(data) {
     let result = {};
-    this.flipAxis = data.asset.upAxis !== 'Y_UP';
+    result.flipAxis = this.flipAxis = data.asset.upAxis !== 'Y_UP';
     result.geometries = arrayToObject(data.geometries || [],
       this.process.bind(this, 'geometry'));
     result.materials = arrayToObject(data.materials || [],
@@ -61,14 +61,6 @@ export default {
         v => this.process('bindingController', v));
     }
     result.matrix = mat4.clone(data.matrix);
-    if (this.flipAxis) {
-      mat4.multiply(result.matrix, [
-        1, 0, 0, 0,
-        0, 0, -1, 0,
-        0, 1, 0, 0,
-        0, 0, 0, 1
-      ], result.matrix);
-    }
     return result;
   },
   visualScene(data) {
@@ -190,9 +182,11 @@ export default {
     // Map each indexInput to bindMatrices.
     let bindMatrices = this.resolve('source',
       data.joints.find(v => v.semantic === 'INV_BIND_MATRIX').source).source;
-    result.joints = indexInput.map((name, i) => ({
-      name, bindMatrix: bindMatrices.subarray(i * 16, i * 16 + 16)
-    }));
+    result.joints = indexInput.map((name, i) => {
+      let bindMatrix = mat4.create();
+      mat4.transpose(bindMatrix, bindMatrices.subarray(i * 16, i * 16 + 16));
+      return { name, bindMatrix };
+    });
     return result;
   },
   camera(data) {
