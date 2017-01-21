@@ -13,8 +13,11 @@ export default function armature(renderer) {
   };
   let collada = loadCollada(require('../geom/cat.dae'));
   let shader = renderer.shaders.create(
-    require('../shader/armature.vert'),
-    require('../shader/normal.frag')
+    require('../shader/armaturePhong.vert'),
+    require('../shader/phong.frag')
+  );
+  let texture = renderer.textures.create(
+    require('../texture/CatTexture.png')
   );
   function bakeMaterial(material) {
     return {
@@ -27,7 +30,8 @@ export default function armature(renderer) {
             new Float32Array([0, 0, 0]) :
             material.specular,
           shininess: material.type === 'lambert' ? 0 : material.shininess
-        }
+        },
+        uDiffuseMap: texture
       }
     };
   }
@@ -48,18 +52,23 @@ export default function armature(renderer) {
       collada.controllers[key].geometry.map(v => channelGeom(v)));
   }
   let world = render(collada, bakedGeometries, bakedMaterials);
-  console.log(world);
-  return (delta, context) => {
-    renderer.render({
-      options: {
-        clearColor: new Float32Array([255, 255, 255, 1]),
-        clearDepth: 1,
-        cull: gl.BACK,
-        depth: gl.LEQUAL
-      },
-      uniforms: context.camera,
-      passes: world
-    });
+  return {
+    update(delta, context) {
+      renderer.render({
+        options: {
+          clearColor: new Float32Array([0, 0, 0, 1]),
+          clearDepth: 1,
+          cull: gl.BACK,
+          depth: gl.LEQUAL
+        },
+        uniforms: context.camera,
+        passes: world
+      });
+    },
+    mousedown(e) {
+      if (e.button !== 0) return;
+      world = render(collada, bakedGeometries, bakedMaterials);
+    }
   };
   /* let geom = renderer.geometries.create(
     data.geometries.map(v => channelGeom(v[0])));
