@@ -33,6 +33,8 @@ export default {
       this.process.bind(this, 'light'));
     result.controllers = arrayToObject(data.controllers || [],
       this.process.bind(this, 'controller'));
+    result.animations = arrayToObject(data.animations || [],
+      this.process.bind(this, 'animation'));
     result.scene = this.resolve('visualScene', data.scene.visualScene);
     console.log(result);
     return result;
@@ -188,6 +190,9 @@ export default {
       return { name, bindMatrix };
     });
     return result;
+  },
+  animation(data) {
+    console.log(data);
   },
   camera(data) {
     return data.optics;

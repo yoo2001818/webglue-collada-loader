@@ -70,47 +70,4 @@ export default function armature(renderer) {
       world = render(collada, bakedGeometries, bakedMaterials);
     }
   };
-  /* let geom = renderer.geometries.create(
-    data.geometries.map(v => channelGeom(v[0])));
-  let texture = renderer.textures.create(
-    require('../texture/CatTexture.png')
-  );
-  let model1Mat = mat4.create();
-  let model1Normal = mat3.create();
-
-  // Bake Material to WebglueRenderNode
-  let bakedMaterials = data.materials.map(v => bakeMaterial(v));
-
-  let nodes = bakeMesh(geom, {
-    'EyeballMat-material': bakedMaterials[0],
-    'Catmat-material': bakedMaterials[1]
-  });
-
-  return (delta, context) => {
-    // mat4.rotateY(model1Mat, model1Mat, Math.PI * delta / 1000 / 2);
-    // mat3.normalFromMat4(model1Normal, model1Mat);
-
-    renderer.render({
-      options: {
-        clearColor: new Float32Array([0, 0, 0, 1]),
-        clearDepth: 1,
-        cull: gl.BACK,
-        depth: gl.LEQUAL
-      },
-      uniforms: Object.assign({}, context.camera, {
-        uPointLight: [{
-          position: [2, 2, 2],
-          color: '#ffffff',
-          intensity: [0.3, 0.8, 1.0, 0.00015]
-        }]
-      }),
-      passes: [{
-        uniforms: {
-          uModel: model1Mat,
-          uNormal: model1Normal
-        },
-        passes: nodes
-      }]
-    });
-  }; */
 }

@@ -5,7 +5,8 @@ import geometry from './geometry';
 import node from './node';
 import camera from './camera';
 import light from './light';
+import animation from './animation';
 
 // Uh.. what?
 export default Object.assign({}, base, controller, fx, geometry, node,
-  camera, light);
+  camera, light, animation);
