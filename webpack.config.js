@@ -44,8 +44,12 @@ module.exports = {
         loader: 'style!css'
       },
       {
-        test: /(\.vert|\.frag|\.obj|\.mtl|\.dae)$/i,
-        loader: 'raw'
+        test: /(\.vert|\.frag)$/i,
+        loader: 'raw-loader'
+      },
+      {
+        test: /(\.obj|\.mtl|\.dae)$/,
+        loader: 'url-loader?limit=10240'
       },
       {
         test: /\.(otf|eot|svg|ttf|woff|woff2)(\?.+)?$/,

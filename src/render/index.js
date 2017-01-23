@@ -94,7 +94,6 @@ export default function render(collada, geometries, materials) {
           });
           // Look up child objects to create matrix.
           lookupSkeleton(lookupTable, controller.skeleton);
-          console.log(matrices);
           // Generate material index
           let materialIndex = {};
           for (let key in controller.materials) {

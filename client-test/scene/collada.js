@@ -11,7 +11,6 @@ export default function collada(renderer) {
       shader === (current == null ? 0 : current.length),
     allocator: current => current == null ? 0 : current.length
   };
-  let collada = loadCollada(require('../geom/pencil.dae'));
   let shader = renderer.shaders.create(
     require('../shader/phong.vert'),
     require('../shader/phong.frag')
@@ -31,19 +30,27 @@ export default function collada(renderer) {
       }
     };
   }
-  // Bake materials
+  let world = [];
   let bakedMaterials = {};
-  for (let key in collada.materials) {
-    bakedMaterials[key] = bakeMaterial(collada.materials[key]);
-  }
-  // Bake geometries
   let bakedGeometries = {};
-  for (let key in collada.geometries) {
-    bakedGeometries[key] = renderer.geometries.create(
-      collada.geometries[key].map(v => channelGeom(v)));
-  }
-  let world = render(collada, bakedGeometries, bakedMaterials);
-  console.log(world);
+  loadCollada(require('../geom/pencil.dae'), true).then(data => {
+    let collada = data;
+    // Bake materials
+    for (let key in collada.materials) {
+      bakedMaterials[key] = bakeMaterial(collada.materials[key]);
+    }
+    // Bake geometries
+    for (let key in collada.geometries) {
+      bakedGeometries[key] = renderer.geometries.create(
+        collada.geometries[key].map(v => channelGeom(v)));
+    }
+    // Bake controllers
+    for (let key in collada.controllers) {
+      bakedGeometries[key] = renderer.geometries.create(
+        collada.controllers[key].geometry.map(v => channelGeom(v)));
+    }
+    world = render(collada, bakedGeometries, bakedMaterials);
+  });
   return (delta, context) => {
     renderer.render({
       options: {
@@ -56,47 +63,4 @@ export default function collada(renderer) {
       passes: world
     });
   };
-  /* let geom = renderer.geometries.create(
-    data.geometries.map(v => channelGeom(v[0])));
-  let texture = renderer.textures.create(
-    require('../texture/CatTexture.png')
-  );
-  let model1Mat = mat4.create();
-  let model1Normal = mat3.create();
-
-  // Bake Material to WebglueRenderNode
-  let bakedMaterials = data.materials.map(v => bakeMaterial(v));
-
-  let nodes = bakeMesh(geom, {
-    'EyeballMat-material': bakedMaterials[0],
-    'Catmat-material': bakedMaterials[1]
-  });
-
-  return (delta, context) => {
-    // mat4.rotateY(model1Mat, model1Mat, Math.PI * delta / 1000 / 2);
-    // mat3.normalFromMat4(model1Normal, model1Mat);
-
-    renderer.render({
-      options: {
-        clearColor: new Float32Array([0, 0, 0, 1]),
-        clearDepth: 1,
-        cull: gl.BACK,
-        depth: gl.LEQUAL
-      },
-      uniforms: Object.assign({}, context.camera, {
-        uPointLight: [{
-          position: [2, 2, 2],
-          color: '#ffffff',
-          intensity: [0.3, 0.8, 1.0, 0.00015]
-        }]
-      }),
-      passes: [{
-        uniforms: {
-          uModel: model1Mat,
-          uNormal: model1Normal
-        },
-        passes: nodes
-      }]
-    });
-  }; */
 }

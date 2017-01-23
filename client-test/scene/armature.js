@@ -11,7 +11,6 @@ export default function armature(renderer) {
       shader === (current == null ? 0 : current.length),
     allocator: current => current == null ? 0 : current.length
   };
-  let collada = loadCollada(require('../geom/cat.dae'));
   let shader = renderer.shaders.create(
     require('../shader/armaturePhong.vert'),
     require('../shader/phong.frag')
@@ -35,23 +34,28 @@ export default function armature(renderer) {
       }
     };
   }
-  // Bake materials
+  let world = [];
+  let collada;
   let bakedMaterials = {};
-  for (let key in collada.materials) {
-    bakedMaterials[key] = bakeMaterial(collada.materials[key]);
-  }
-  // Bake geometries
   let bakedGeometries = {};
-  for (let key in collada.geometries) {
-    bakedGeometries[key] = renderer.geometries.create(
-      collada.geometries[key].map(v => channelGeom(v)));
-  }
-  // Bake controllers
-  for (let key in collada.controllers) {
-    bakedGeometries[key] = renderer.geometries.create(
-      collada.controllers[key].geometry.map(v => channelGeom(v)));
-  }
-  let world = render(collada, bakedGeometries, bakedMaterials);
+  loadCollada(require('../geom/cat.dae'), true).then(data => {
+    collada = data;
+    // Bake materials
+    for (let key in collada.materials) {
+      bakedMaterials[key] = bakeMaterial(collada.materials[key]);
+    }
+    // Bake geometries
+    for (let key in collada.geometries) {
+      bakedGeometries[key] = renderer.geometries.create(
+        collada.geometries[key].map(v => channelGeom(v)));
+    }
+    // Bake controllers
+    for (let key in collada.controllers) {
+      bakedGeometries[key] = renderer.geometries.create(
+        collada.controllers[key].geometry.map(v => channelGeom(v)));
+    }
+    world = render(collada, bakedGeometries, bakedMaterials);
+  });
   return {
     update(delta, context) {
       renderer.render({
@@ -67,7 +71,9 @@ export default function armature(renderer) {
     },
     mousedown(e) {
       if (e.button !== 0) return;
-      world = render(collada, bakedGeometries, bakedMaterials);
+      if (collada != null) {
+        world = render(collada, bakedGeometries, bakedMaterials);
+      }
     }
   };
 }
