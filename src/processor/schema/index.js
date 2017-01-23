@@ -198,7 +198,15 @@ export default {
     return result;
   },
   animation(data) {
-    console.log(data);
+    data.channel.forEach(channel => {
+      let source = this.resolve('sampler', channel.source);
+      console.log(channel.target, source);
+    });
+  },
+  sampler(data) {
+    return data.map(v => Object.assign({
+      semantic: v.semantic
+    }, this.resolve('source', v.source)));
   },
   camera(data) {
     return data.optics;
