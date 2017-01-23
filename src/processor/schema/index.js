@@ -1,4 +1,5 @@
 import { vec3, mat4 } from 'gl-matrix';
+import calcTransform from '../../util/transform';
 
 const SEMANTIC_ATTRIBUTE_TABLE = {
   POSITION: 'aPosition',
@@ -62,7 +63,12 @@ export default {
       result.controllers = data.controllers.map(
         v => this.process('bindingController', v));
     }
-    result.matrix = mat4.clone(data.matrix);
+    result.transform = data.transform;
+    // We need to convert each transform to matrix.
+    // If animation is specified, we need to recalculate that every frame,
+    // But let's calculate the matrix anyway even if the animation is specified,
+    // since some program might not want to use animation.
+    result.matrix = calcTransform(result.transform);
     return result;
   },
   visualScene(data) {
@@ -300,16 +306,9 @@ export default {
     } else {
       source = source.slice(offset, offset + count * stride);
     }
-    // If X / Y / Z is provided, we need to flip the axis
-    /* if (this.flipAxis && options.params.indexOf('X') !== -1) {
-      if (source.subarray != null) source = source.slice();
-      for (let i = 0; i < source.length; i += 3) {
-        // Flip Y, Z, while inverting Y value
-        let tmp = -source[i + 1];
-        source[i + 1] = source[i + 2];
-        source[i + 2] = tmp;
-      }
-    } */
+    // TODO If matrix is specified, we need to transpose each indices to avoid
+    // column / row order issue. Or maybe we could transpose it everytime the
+    // program uses it. But it's inefficient.
     return { source, axis: stride };
   },
   raw(data) {
