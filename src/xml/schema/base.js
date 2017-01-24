@@ -86,7 +86,7 @@ export default {
       accessor: hierarchy(
         {
           param: rename('params', multiple(attributes(
-            ({ attributes }) => attributes.name
+            ({ attributes }) => attributes
           )))
         },
         ({ attributes }, frame) => {

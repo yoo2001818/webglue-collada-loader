@@ -190,11 +190,9 @@ export default {
     // Map each indexInput to bindMatrices.
     let bindMatrices = this.resolve('source',
       data.joints.find(v => v.semantic === 'INV_BIND_MATRIX').source).source;
-    result.joints = indexInput.map((name, i) => {
-      let bindMatrix = mat4.create();
-      mat4.transpose(bindMatrix, bindMatrices.subarray(i * 16, i * 16 + 16));
-      return { name, bindMatrix };
-    });
+    result.joints = indexInput.map((name, i) => ({
+      name, bindMatrix: bindMatrices.subarray(i * 16, i * 16 + 16)
+    }));
     return result;
   },
   animation(data) {
@@ -314,9 +312,33 @@ export default {
     } else {
       source = source.slice(offset, offset + count * stride);
     }
-    // TODO If matrix is specified, we need to transpose each indices to avoid
-    // column / row order issue. Or maybe we could transpose it everytime the
-    // program uses it. But it's inefficient.
+    // TODO What if single input has more than 2 matrices? That won't happen,
+    // I suppose.
+    if (options.params.length === 1) {
+      let param = options.params[0];
+      let regex = /^float(\d)x(\d)$/.exec(param.type);
+      if (regex != null) {
+        // Transpose the matrix.
+        let width = parseInt(regex[1]), height = parseInt(regex[2]);
+        // TODO We should support matrices that its width and height
+        // are different, But not for now.
+        if (width !== height) {
+          throw new Error('Matrix must have same width and height');
+        }
+        for (let i = 0; i < count; ++i) {
+          let offset = i * stride;
+          for (let x = 0; x < width - 1; ++x) {
+            for (let y = x + 1; y < width; ++y) {
+              let src = offset + y * width + x;
+              let dest = offset + x * width + y;
+              let swp = source[dest];
+              source[dest] = source[src];
+              source[src] = swp;
+            }
+          }
+        }
+      }
+    }
     return { source, axis: stride };
   },
   raw(data) {
