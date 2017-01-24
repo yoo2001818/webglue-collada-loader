@@ -54,10 +54,15 @@ export default function armature(renderer) {
       bakedGeometries[key] = renderer.geometries.create(
         collada.controllers[key].geometry.map(v => channelGeom(v)));
     }
-    world = render(collada, bakedGeometries, bakedMaterials);
+    world = render(collada, bakedGeometries, bakedMaterials, 0);
   });
+  let timer = 0;
   return {
     update(delta, context) {
+      timer += delta;
+      if (collada != null) {
+        world = render(collada, bakedGeometries, bakedMaterials, timer % 5);
+      }
       renderer.render({
         options: {
           clearColor: new Float32Array([0, 0, 0, 1]),
@@ -68,12 +73,6 @@ export default function armature(renderer) {
         uniforms: context.camera,
         passes: world
       });
-    },
-    mousedown(e) {
-      if (e.button !== 0) return;
-      if (collada != null) {
-        world = render(collada, bakedGeometries, bakedMaterials);
-      }
     }
   };
 }

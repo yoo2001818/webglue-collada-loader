@@ -204,7 +204,7 @@ export default {
     return result;
   },
   animation(data) {
-    data.channel.forEach(channel => {
+    return data.channel.map(channel => {
       let source = this.resolve('sampler', channel.source);
       // Parse the target. Due to the limitation of the animation, it'll only
       // parse transform changes for now.
@@ -215,13 +215,11 @@ export default {
       let transform = object.transform.find(v => v.sid === sid);
 
       // Convert the source into animation object.
-      let animation = {};
+      // TODO Axis support
+      let animation = { id, sid, axis };
       source.forEach(v => {
         animation[SEMANTIC_ANIMATION_TABLE[v.semantic]] = v.source;
       });
-      animation.sid = sid;
-      // TODO Axis support
-      animation.axis = axis;
 
       if (transform.animations == null) transform.animations = [];
       transform.animations.push(animation);
@@ -229,6 +227,8 @@ export default {
       // the object has animation.
       if (object.animations == null) object.animations = [];
       object.animations.push(animation);
+
+      return animation;
     });
   },
   sampler(data) {

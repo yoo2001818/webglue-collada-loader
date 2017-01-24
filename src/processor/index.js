@@ -18,6 +18,9 @@ export default class Processor {
   //   it first then processing the schema.
   // TODO What about sid?
   process(schema, data, options, _id) {
+    if (data.id != null && this.namespace[data.id] != null) {
+      return this.namespace[data.id];
+    }
     let id;
     if (_id == null) id = data.id;
     let schemaResolved = this.resolveSchema(schema);
