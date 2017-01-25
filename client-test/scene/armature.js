@@ -38,7 +38,7 @@ export default function armature(renderer) {
   let collada;
   let bakedMaterials = {};
   let bakedGeometries = {};
-  loadCollada(require('../geom/cat.dae'), true).then(data => {
+  loadCollada(require('../geom/catnew23.dae'), true).then(data => {
     collada = data;
     // Bake materials
     for (let key in collada.materials) {
