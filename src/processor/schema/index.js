@@ -17,6 +17,14 @@ const SEMANTIC_ANIMATION_TABLE = {
   OUT_TANGENT: 'outTangent'
 };
 
+const ATTRIBUTE_MEMBER_TABLE = {
+  R: 0, G: 1, B: 2, A: 3,
+  ANGLE: 3,
+  S: 0, T: 1, P: 2, Q: 3,
+  X: 0, Y: 1, Z: 2, W: 3,
+  U: 0, V: 1
+};
+
 const MATERIAL_FIELDS = ['emission', 'ambient', 'diffuse', 'specular',
   'reflective', 'transparent'];
 
@@ -216,7 +224,7 @@ export default {
 
       // Convert the source into animation object.
       // TODO Axis support
-      let animation = { id, sid, axis };
+      let animation = { id, sid, axis: ATTRIBUTE_MEMBER_TABLE[axis] };
       source.forEach(v => {
         animation[SEMANTIC_ANIMATION_TABLE[v.semantic]] = v.source;
       });
