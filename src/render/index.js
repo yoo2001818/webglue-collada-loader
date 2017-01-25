@@ -54,7 +54,7 @@ function getMatrix(node, time) {
         }
       }
     });
-    mat4.transpose(modified, modified);
+    if (modified.length === 16) mat4.transpose(modified, modified);
     return { type: transform.type, data: modified };
   }));
 }

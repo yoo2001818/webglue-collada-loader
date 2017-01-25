@@ -261,9 +261,12 @@ export default {
       let surface = params[sampler.source];
       // 3. Resolve image (This is up to the user)
       technique[key] = new Float32Array([1, 1, 1]);
-      technique[key + 'Map'] = surface.init_from;
+      technique[key + 'Map'] = this.resolve('image', surface.init_from);
     });
     return technique;
+  },
+  image(data) {
+    return data.url;
   },
   geometry(data) {
     // We only take polylists.

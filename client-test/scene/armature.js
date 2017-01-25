@@ -15,22 +15,24 @@ export default function armature(renderer) {
     require('../shader/armaturePhong.vert'),
     require('../shader/phong.frag')
   );
-  let texture = renderer.textures.create(
-    require('../texture/CatTexture.png')
-  );
+  let textures = {
+    'CatTexture.png': renderer.textures.create(
+      require('../texture/CatTexture.png'))
+  };
   function bakeMaterial(material) {
     return {
       shader,
       uniforms: {
         uMaterial: {
-          ambient: material.ambient.map((v, i) => v * material.diffuse[i]),
+          // Since Blender doesn't support ambient value, make it to 1.
+          ambient: material.ambient.map((v, i) => 0.3 * material.diffuse[i]),
           diffuse: material.diffuse,
           specular: material.type === 'lambert' ?
             new Float32Array([0, 0, 0]) :
             material.specular,
           shininess: material.type === 'lambert' ? 0 : material.shininess
         },
-        uDiffuseMap: texture
+        uDiffuseMap: textures[material.diffuseMap]
       }
     };
   }
@@ -38,7 +40,7 @@ export default function armature(renderer) {
   let collada;
   let bakedMaterials = {};
   let bakedGeometries = {};
-  loadCollada(require('../geom/catnew23.dae'), true).then(data => {
+  loadCollada(require('../geom/catnewfloor.dae'), true).then(data => {
     collada = data;
     // Bake materials
     for (let key in collada.materials) {
