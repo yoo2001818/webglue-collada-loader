@@ -61,7 +61,7 @@ export default function armature(renderer) {
     update(delta, context) {
       timer += delta;
       if (collada != null) {
-        world = render(collada, bakedGeometries, bakedMaterials, timer % 5);
+        world = render(collada, bakedGeometries, bakedMaterials, timer % 1.66);
       }
       renderer.render({
         options: {

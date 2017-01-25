@@ -1,6 +1,10 @@
-import { vec3, mat3, mat4 } from 'gl-matrix';
+import { vec3, quat, mat3, mat4 } from 'gl-matrix';
 import bakeMesh from 'webglue/lib/util/bakeMesh';
 import calcTransform from '../util/transform';
+
+let tmpTranslation = vec3.create(), tmpTranslation2 = vec3.create();
+let tmpScaling = vec3.create(), tmpScaling2 = vec3.create();
+let tmpRotation = quat.create(), tmpRotation2 = quat.create();
 
 function getMatrix(node, time) {
   // Calculate matrix, with animations.
@@ -23,12 +27,31 @@ function getMatrix(node, time) {
       let prevIn = animation.input[prevIndex];
       let offset = (time - prevIn) / (currentIn - prevIn);
       if (isNaN(offset)) offset = 0;
+      if (offset > 1) offset = 1;
       // TODO This should be changed if channel is specified.
       let stride = modified.length;
-      for (let i = 0; i < stride; ++i) {
-        let currentOut = animation.output[index * stride + i];
-        let prevOut = animation.output[prevIndex * stride + i];
-        modified[i] = (currentOut - prevOut) * offset + prevOut;
+      if (stride === 16) {
+        // Assume a matrix; we need to separate translation / rotation /
+        // scale and interpolate them separately, then merge them.
+        // This'd be quite slow..
+        let currentMat = animation.output.subarray(index * stride,
+          index * stride + 16);
+        let prevMat = animation.output.subarray(prevIndex * stride,
+          prevIndex * stride + 16);
+        mat4.getTranslation(tmpTranslation2, prevMat);
+        mat4.getTranslation(tmpTranslation, currentMat);
+        mat4.getRotation(tmpRotation2, prevMat);
+        mat4.getRotation(tmpRotation, currentMat);
+        // TODO Skip scale for now
+        vec3.lerp(tmpTranslation, tmpTranslation2, tmpTranslation, offset);
+        quat.slerp(tmpRotation, tmpRotation2, tmpRotation, offset);
+        mat4.fromRotationTranslation(modified, tmpRotation, tmpTranslation);
+      } else {
+        for (let i = 0; i < stride; ++i) {
+          let currentOut = animation.output[index * stride + i];
+          let prevOut = animation.output[prevIndex * stride + i];
+          modified[i] = (currentOut - prevOut) * offset + prevOut;
+        }
       }
     });
     mat4.transpose(modified, modified);
