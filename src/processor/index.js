@@ -21,7 +21,7 @@ export default class Processor {
     if (data.id != null && this.namespace[data.id] != null) {
       return this.namespace[data.id];
     }
-    let id;
+    let id = _id;
     if (_id == null) id = data.id;
     let schemaResolved = this.resolveSchema(schema);
     let result = schemaResolved.call(this, data, options);

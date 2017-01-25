@@ -40,7 +40,7 @@ export default function armature(renderer) {
   let collada;
   let bakedMaterials = {};
   let bakedGeometries = {};
-  loadCollada(require('../geom/catnewfloor.dae'), true).then(data => {
+  loadCollada(require('../geom/door.dae'), true).then(data => {
     collada = data;
     // Bake materials
     for (let key in collada.materials) {
@@ -63,7 +63,7 @@ export default function armature(renderer) {
     update(delta, context) {
       timer += delta;
       if (collada != null) {
-        world = render(collada, bakedGeometries, bakedMaterials, timer % 1.66);
+        world = render(collada, bakedGeometries, bakedMaterials, timer % 8);
       }
       renderer.render({
         options: {
