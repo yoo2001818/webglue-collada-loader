@@ -26,9 +26,13 @@ export const TYPES = {
 };
 
 let tmpMat4 = mat4.create();
+let priority = ['scale', 'rotation', 'translate'];
 
 export default function calcTransform(transforms) {
-  return transforms.reduce((matrix, transform) => {
+  let transformSorted = transforms.slice();
+  transformSorted.sort((a, b) =>
+    priority.indexOf(a.type) - priority.indexOf(b.type));
+  return transformSorted.reduce((matrix, transform) => {
     // Calculate each matrix, then multiply it with original matrix.
     let type = TYPES[transform.type];
     if (type == null) throw new Error(`${transform.type} is not defined type`);
